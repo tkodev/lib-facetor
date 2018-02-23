@@ -25,6 +25,7 @@ var catalogFacets = new Facets({
     ]
 });
 
-catalogFacets.search([
+var results = catalogFacets.search([
     "title.rural"
 ])
+console.log(results);

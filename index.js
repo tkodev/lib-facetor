@@ -1,6 +1,6 @@
 var bigInt = require('big-integer')
 
-function Constructor(index) {
+function Constructor(config, importing) {
 
 	// deep clone an object
 	function deepClone(obj){
@@ -66,32 +66,26 @@ function Constructor(index) {
 	}
 
 	// internal - build index
-	var _index = deepClone(index) || {
-		facets: [],
-		items: []
-	};
-	var _results = {};
-	_index.facets = buildFacets(_index.items, _index.facets);
-	_index.facets = convertBitmaps(_index.items, _index.facets);
-	_index.facets = convertBigInt(_index.facets);
+	var _default = {
+		facets: {},
+		items: {}
+	}
+	var _index = deepClone(config) || _default;
+	if (!importing){
+		_index.facets = buildFacets(_index.items, _index.facets);
+		_index.facets = convertBitmaps(_index.items, _index.facets);
+		_index.facets = convertBigInt(_index.facets);
+	}
+	var _results = deepClone(_index) || _default;
 
 	// external - build results
 	this.search = function search(facets){
-		// console.log("[facets]", facets);
-		// build store
-		// _results = traverse(_store.index, function(node, path, level){
-		//	 console.log(node, path);
-	
-		//	 return node
-		// })
-		// console.log("[results]", _results);
+		_results.facets = traverse(_index.facets, function(node, path, level){
+			 return node
+		})
 		return _results;
 	};
 	
-	// feedback
-	console.log("[init index]", JSON.stringify(_index.facets, null, "\t"));
-	console.log("[init results]", _results);
-
 };
 
 module.exports = exports = Constructor;
