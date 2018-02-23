@@ -23,5 +23,9 @@
   "bugs": {
     "url": "https://github.com/htkoca/facets.js/issues"
   },
-  "homepage": "https://github.com/htkoca/facets.js#readme"
+  "homepage": "https://github.com/htkoca/facets.js#readme",
+  "dependencies": {
+    "big-integer": "^1.6.26",
+    "underscore": "^1.8.3"
+  }
 }
