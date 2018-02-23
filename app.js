@@ -22,10 +22,6 @@ var catalogFacets = new Facets({
             title: "urban",
             category: "locks"
         }
-    ], 
-    boolean: [
-        "AND",
-        "OR"
     ]
 });
 
