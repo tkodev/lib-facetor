@@ -29,8 +29,8 @@ var catalogFacets = new Facets({
     ]
 });
 
-var results = catalogFacets.search({
+var results = catalogFacets.getResults({
     facets: ["index.title"],
-    boolean: ["AND", "OR"]
+    operators: ["AND", "OR"]
 });
-// console.log(JSON.stringify(results.index, null, "\t"));
+console.log(JSON.stringify(results.index, null, "\t"));

@@ -1,7 +1,7 @@
 var bigInt = require('big-integer')
 var _ = require('underscore')
 
-function Constructor(config, importing) {
+function Constructor(config) {
 
 	// ****************************************************************************************************
 	// Shared functions
@@ -14,13 +14,13 @@ function Constructor(config, importing) {
 
 	// shared - deep map an object, call function on node with bitmap key (recursive)
 	function deepForEach(node, callback, path, level){
-		path = path || "index";
+		path = path || "";
 		level = level || 0;
 		if(node.hasOwnProperty("bitmap")){
 			return callback(node, path, level)
 		} else {
 			node = _.mapObject(node, function(childNode, key) {
-				var childPath = path+"."+key;
+				var childPath = path ? path+"."+key : key;
 				var childLevel = level + 1;
 				return deepForEach(childNode, callback, childPath, childLevel)
 			});
@@ -52,10 +52,10 @@ function Constructor(config, importing) {
 	};
 	
 	// shared - set status based on boolean
-	function setBigInt(index, boolean){
+	function setStatus(index, boolean){
 		return deepForEach(index, function(node, path){
-			if(node.bitmap){
-				node.status = boolean;
+			if(node._bitmap){
+				node._status = boolean;
 			}
 			return node;
 		});
@@ -64,8 +64,8 @@ function Constructor(config, importing) {
 	// shared - set bitmaps to big int based on boolean
 	function setBigInt(index, boolean){
 		return deepForEach(index, function(node, path){
-			if(node.bitmap){
-				node.bitmap = boolean ? bigInt(node.bitmap, 2) : bitmap.toString(2);
+			if(node._bitmap){
+				node._bitmap = boolean ? bigInt(node._bitmap, 2) : bitmap.toString(2);
 			}
 			return node;
 		});
@@ -83,7 +83,7 @@ function Constructor(config, importing) {
 					var itemValues = Array.isArray(item[facetKey]) ? item[facetKey] : [ item[facetKey] ];
 					itemValues.forEach(function (facet) {
 						index[facetKey][facet] = index[facetKey][facet] || {
-							bitmap: ''
+							_bitmap: ''
 						};
 					});
 				}
@@ -99,9 +99,9 @@ function Constructor(config, importing) {
 				Object.keys(index[facetKey]).forEach(function(facet){
 					var itemValues = Array.isArray(item[facetKey]) ? item[facetKey] : [ item[facetKey] ];
 					if(itemValues.indexOf(facet) > -1){
-						index[facetKey][facet].bitmap = '1' + index[facetKey][facet].bitmap;
+						index[facetKey][facet]._bitmap = '1' + index[facetKey][facet]._bitmap;
 					} else {
-						index[facetKey][facet].bitmap = '0' + index[facetKey][facet].bitmap;
+						index[facetKey][facet]._bitmap = '0' + index[facetKey][facet]._bitmap;
 					}
 				})
 			})
@@ -115,23 +115,37 @@ function Constructor(config, importing) {
 	// ****************************************************************************************************
 
 	// results - get bitmap based on supplied index, facets and current path
-	function getBitmap(index, facets, path){
-		var tempFacets = deepClone(facets).push(path);
+	function getBitmap(index, options, node, path, length){
+		var tempFacets = deepClone(options.facets)
 		var tempIndex = deepClone(index);
+		var allOnes = bigInt(1).shiftLeft(length).minus(1);
+		if(path){
+			tempFacets.push(path);
+		}
 		tempFacets.forEach(function(facet){
-			tempIndex = setObjProp(tempIndex, facet, true);
+			tempIndex = setObjProp(tempIndex, path, setStatus(node, true));
 		})
 		// index to bitmap logic here
+		// return bigInt(0);
+		return allOnes
 	}
 
-	// get count based on suppled bitmap
+	// results - get count based on suppled bitmap
 	function getCount(bitmap){
-		// bitmap to count logic here
+		var count = 0;
+		while (bitmap > 0) {
+			// Count all the 1s in curBitmap, which is the count of matched products
+			bitmap = bitmap.and(bitmap.minus(1));
+			count++;
+		}
+		return count;
 	}
 
-	// get products based on supplied bitmap
-	function getItems(bitmap){
-		// bitmap to items logic here
+	// results - get products based on supplied bitmap
+	function getItems(items, bitmap){
+		return items.filter(function(elem, idx){
+			return bitmap.and(bigInt(1).shiftLeft(idx)) > 0;
+		})
 	}
 
 
@@ -139,28 +153,38 @@ function Constructor(config, importing) {
 	// Main Logic
 	// ****************************************************************************************************
 
-	// internal - init constructor
-	var store = deepClone(config) || {
+	// internal - build index
+	var store = {
 		index: {},
-		items: {}
+		items: []
 	};
-	if (!importing){
+	if (config){
+		store = deepClone(config)
 		store.index = buildIndex(store.items, store.index);
 		store.index = convertBitmaps(store.items, store.index);
 	}
 
 	// external - build results
-	this.search = function search(options){
+	this.getResults = function getResults(options){
 		var results = deepClone(store);
 		results.index = setBigInt(results.index, true);
 		results.index = deepForEach(results.index, function(node, path, level){
-			node.bitmap = getBitmap(results.index, options.facets, path);
-			node.count = getCount(node.bitmap);
+			node._bitmap = getBitmap(results.index, options, node, path, results.items.length);
+			node._count = getCount(node._bitmap);
 			return node;
 		})
-		results.items = getItems(results.index.bitmap);
+		results.items = getItems(results.items, results.index._bitmap);
 		return results;
 	};
+
+	// external - export store
+	this.getStore = function getStore(){
+		return store;
+	}
+	// external - import store
+	this.setStore = function setStore(input){
+		return store = input;
+	}
 	
 };
 
