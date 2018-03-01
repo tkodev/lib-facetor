@@ -115,7 +115,7 @@ function Constructor(config, importing) {
 	// ****************************************************************************************************
 
 	// results - get bitmap based on supplied index, facets and current path
-	getBitmap(index, facets, path){
+	function getBitmap(index, facets, path){
 		var tempFacets = deepClone(facets).push(path);
 		var tempIndex = deepClone(index);
 		tempFacets.forEach(function(facet){
@@ -125,15 +125,14 @@ function Constructor(config, importing) {
 	}
 
 	// get count based on suppled bitmap
-	getCount(bitmap){
+	function getCount(bitmap){
 		// bitmap to count logic here
 	}
 
 	// get products based on supplied bitmap
-	getItems(bitmap){
+	function getItems(bitmap){
 		// bitmap to items logic here
 	}
-	
 
 
 	// ****************************************************************************************************
