@@ -1,9 +1,9 @@
 # facets.js (WIP)
-- a npm / bower module for faceted filtering of an array
+- 🔍 a npm / bower module for faceted filtering of an array
 
 ## USAGE
 ### Build index
-- To initiate the module, create an obj of containing facetable attributes, and an array of items which has those attributes. 
+- To initiate the module, create an obj containing facetable attributes, and an array of items which has those attributes. 
 ```js
 var Facets = require('facets')
 
@@ -68,29 +68,43 @@ var results = facets.getResults({
         "title": {
                 "rural": {
                         "_bitmap": "31",
-                        "_count": 5
+                        "_count": 5,
+                        "_path": "title.rural",
+                        "_level": 2
                 },
                 "urban": {
                         "_bitmap": "31",
-                        "_count": 5
+                        "_count": 5,
+                        "_path": "title.urban",
+                        "_level": 2
                 },
                 "_bitmap": "31",
-                "_count": 5
+                "_count": 5,
+                "_path": "title",
+                "_level": 1
         },
         "category": {
                 "stroller": {
                         "_bitmap": "31",
-                        "_count": 5
+                        "_count": 5,
+                        "_path": "category.stroller",
+                        "_level": 2
                 },
                 "locks": {
                         "_bitmap": "31",
-                        "_count": 5
+                        "_count": 5,
+                        "_path": "category.locks",
+                        "_level": 2
                 },
                 "_bitmap": "31",
-                "_count": 5
+                "_count": 5,
+                "_path": "category",
+                "_level": 1
         },
         "_bitmap": "31",
-        "_count": 5
+        "_count": 5,
+        "_path": "",
+        "_level": 0
 }
 ```
 

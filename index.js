@@ -171,6 +171,8 @@ function Constructor(config) {
 		results.index = deepForEach(results.index, function(node, path, level){
 			node._bitmap = getBitmap(results.index, options, node, path, results.items.length);
 			node._count = getCount(node._bitmap);
+			node._path = path;
+			node._level = level;
 			return node;
 		})
 		results.items = getItems(results.items, results.index._bitmap);
