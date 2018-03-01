@@ -1,115 +1,166 @@
 var bigInt = require('big-integer')
+var _ = require('underscore')
 
 function Constructor(config, importing) {
+
+	// ****************************************************************************************************
+	// Shared functions
+	// ****************************************************************************************************
 
 	// shared - deep clone an object
 	function deepClone(obj){
 		return obj ? JSON.parse(JSON.stringify(obj)) : null;
 	}
 
+	// shared - deep map an object, call function on node with bitmap key (recursive)
+	function deepForEach(node, callback, path, level){
+		path = path || "index";
+		level = level || 0;
+		if(node.hasOwnProperty("bitmap")){
+			return callback(node, path, level)
+		} else {
+			node = _.mapObject(node, function(childNode, key) {
+				var childPath = path+"."+key;
+				var childLevel = level + 1;
+				return deepForEach(childNode, callback, childPath, childLevel)
+			});
+			return callback(node, path, level)
+		}
+	}
+
+	// shared - Set an object's deep nested property based on "|" delimited string path
+	function setObjProp(obj, path, val) {
+		path = path.split('.');
+		for (i = 0; i < path.length - 1; i++){
+			if(_.keys(obj).indexOf(path[i]) > -1){
+				obj = obj[path[i]];
+			}
+		}
+		if(_.keys(obj).indexOf(path[i]) > -1){
+			obj[path[i]] = val;
+		}
+	}
+
+	// shared - Get an object's deep nested property based on "|" delimited string path
+	function getObjProp(obj, path){
+		for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
+			if(_.keys(obj).indexOf(path[i]) > -1){
+				obj = obj[path[i]];
+			}
+		};
+		return obj;
+	};
+	
+	// shared - set status based on boolean
+	function setBigInt(index, boolean){
+		return deepForEach(index, function(node, path){
+			if(node.bitmap){
+				node.status = boolean;
+			}
+			return node;
+		});
+	}
+
+	// shared - set bitmaps to big int based on boolean
+	function setBigInt(index, boolean){
+		return deepForEach(index, function(node, path){
+			if(node.bitmap){
+				node.bitmap = boolean ? bigInt(node.bitmap, 2) : bitmap.toString(2);
+			}
+			return node;
+		});
+	}
+
+	// ****************************************************************************************************
+	// Index functions
+	// ****************************************************************************************************
+
 	// index - build item facets into index
-	function buildFacets(items, facets){
+	function buildIndex(items, index){
 		items.forEach(function(item){
-			Object.keys(facets).forEach(function(facetKey){
+			Object.keys(index).forEach(function(facetKey){
 				if(item.hasOwnProperty(facetKey)){
 					var itemValues = Array.isArray(item[facetKey]) ? item[facetKey] : [ item[facetKey] ];
 					itemValues.forEach(function (facet) {
-						facets[facetKey][facet] = facets[facetKey][facet] || {
+						index[facetKey][facet] = index[facetKey][facet] || {
 							bitmap: ''
 						};
 					});
 				}
 			})
 		})
-		return facets;
+		return index;
 	}
 
 	// index - convert item positions to facet binary bitmap
-	function convertBitmaps(items, facets){
+	function convertBitmaps(items, index){
 		items.forEach(function(item){
-			Object.keys(facets).forEach(function(facetKey){
-				Object.keys(facets[facetKey]).forEach(function(facet){
+			Object.keys(index).forEach(function(facetKey){
+				Object.keys(index[facetKey]).forEach(function(facet){
 					var itemValues = Array.isArray(item[facetKey]) ? item[facetKey] : [ item[facetKey] ];
 					if(itemValues.indexOf(facet) > -1){
-						facets[facetKey][facet].bitmap = '1' + facets[facetKey][facet].bitmap;
+						index[facetKey][facet].bitmap = '1' + index[facetKey][facet].bitmap;
 					} else {
-						facets[facetKey][facet].bitmap = '0' + facets[facetKey][facet].bitmap;
+						index[facetKey][facet].bitmap = '0' + index[facetKey][facet].bitmap;
 					}
 				})
 			})
 		})
-		return facets;
+		return index;
 	}
 
-	// index - convert binary bitmaps to big int string
-	function convertBigInt(facets){
-		Object.keys(facets).forEach(function(facetKey){
-			Object.keys(facets[facetKey]).forEach(function(facet){
-				facets[facetKey][facet].bitmap = bigInt(facets[facetKey][facet].bitmap, 2).toString();
-			})
+
+	// ****************************************************************************************************
+	// Results functions
+	// ****************************************************************************************************
+
+	// results - get bitmap based on supplied index, facets and current path
+	getBitmap(index, facets, path){
+		var tempFacets = deepClone(facets).push(path);
+		var tempIndex = deepClone(index);
+		tempFacets.forEach(function(facet){
+			tempIndex = setObjProp(tempIndex, facet, true);
 		})
-		return facets
+		// index to bitmap logic here
 	}
 
-	// results - deep traverse an object (recursive)
-	function traverse(node, callback, path, level){
-		if(node.hasOwnProperty("bitmap")){
-			return callback(node, path, level)
-		} else {
-			Object.keys(node).forEach(function(key){
-				var nodePath = path ? path+"."+key: key;
-				var nodeLevel = level ? level + 1 : 0;
-				node[key] = traverse(node[key], callback, nodePath, nodeLevel)
-			})
-			return node;
-		}
+	// get count based on suppled bitmap
+	getCount(bitmap){
+		// bitmap to count logic here
 	}
 
-	// results - compute bitmap value based on active filters
-	function getBitmap(index, length){
-		// return nested function result
-		return andCategories(index, length);
-		// nested function, traverse categories, use AND logic on each
-		function andCategories(categories, length){
-			var allOnes = bigInt(1).shiftLeft(length).minus(1);
-			return _.values(categories).reduce(function(accumulator, filters){
-				var rslt = orFilters(filters);
-				// If rslt contains matches, return matches, else match all.
-				rslt = rslt.value ? rslt : allOnes;
-				return accumulator.and(rslt);
-			}, allOnes);
-		}
-		// nested function - traverse filter items, use OR logic on each (recursive)
-		function orFilters(filters){
-			return _.values(filters).reduce(function(accumulator, filter){
-				if (filter.hasOwnProperty('status') && (bigInt.isInstance(filter.status[0]) || Array.isArray(filter.status))){
-					return accumulator.or(filter.status[0] || bigInt(0));
-				} else {
-					return accumulator.or(orFilters(filter) || bigInt(0));
-				}
-			}, bigInt(0));
-		}
+	// get products based on supplied bitmap
+	getItems(bitmap){
+		// bitmap to items logic here
 	}
+	
 
-	// internal - build index
-	var _default = {
-		facets: {},
+
+	// ****************************************************************************************************
+	// Main Logic
+	// ****************************************************************************************************
+
+	// internal - init constructor
+	var store = deepClone(config) || {
+		index: {},
 		items: {}
-	}
-	var _index = deepClone(config) || _default;
+	};
 	if (!importing){
-		_index.facets = buildFacets(_index.items, _index.facets);
-		_index.facets = convertBitmaps(_index.items, _index.facets);
-		_index.facets = convertBigInt(_index.facets);
+		store.index = buildIndex(store.items, store.index);
+		store.index = convertBitmaps(store.items, store.index);
 	}
-	var _results = deepClone(_index) || _default;
 
 	// external - build results
-	this.search = function search(facets){
-		_results.facets = traverse(_index.facets, function(node, path, level){
-			 return node
+	this.search = function search(options){
+		var results = deepClone(store);
+		results.index = setBigInt(results.index, true);
+		results.index = deepForEach(results.index, function(node, path, level){
+			node.bitmap = getBitmap(results.index, options.facets, path);
+			node.count = getCount(node.bitmap);
+			return node;
 		})
-		return _results;
+		results.items = getItems(results.index.bitmap);
+		return results;
 	};
 	
 };
