@@ -118,12 +118,13 @@ function Constructor(config) {
 	function getBitmap(index, options, node, path, length){
 		var tempFacets = deepClone(options.facets)
 		var tempIndex = deepClone(index);
+		var tempNode = deepClone(node);
 		var allOnes = bigInt(1).shiftLeft(length).minus(1);
 		if(path){
 			tempFacets.push(path);
 		}
 		tempFacets.forEach(function(facet){
-			tempIndex = setObjProp(tempIndex, path, setStatus(node, true));
+			tempIndex = setObjProp(tempIndex, path, setStatus(tempNode, true));
 		})
 		// index to bitmap logic here
 		// return bigInt(0);
@@ -148,6 +149,27 @@ function Constructor(config) {
 		})
 	}
 
+	function getAttr(index, items, options){
+		return deepForEach(index, function(node, path, level){
+			var bitmap = getBitmap(index, options, node, path, items.length);
+			if (options.showBitmap){
+				node._bitmap = bitmap;
+			} else {
+				delete node._bitmap;
+			}
+			if (options.showCount){
+				node._count = getCount(bitmap);
+			}
+			if (options.showPath){
+				node._path = path;
+			}
+			if (options.showLevel){
+				node._level = level;
+			}
+			return node;
+		})
+	}
+
 
 	// ****************************************************************************************************
 	// Main Logic
@@ -167,15 +189,9 @@ function Constructor(config) {
 	// external - build results
 	this.getResults = function getResults(options){
 		var results = deepClone(store);
-		results.index = setBigInt(results.index, true);
-		results.index = deepForEach(results.index, function(node, path, level){
-			node._bitmap = getBitmap(results.index, options, node, path, results.items.length);
-			node._count = getCount(node._bitmap);
-			node._path = path;
-			node._level = level;
-			return node;
-		})
-		results.items = getItems(results.items, results.index._bitmap);
+		// results.index = setBigInt(results.index, true);
+		results.items = getItems(results.items, getBitmap(results.index, options, results.index, "", results.items.length))
+		results.index = getAttr(results.index, results.items, options)
 		return results;
 	};
 

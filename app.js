@@ -31,6 +31,7 @@ var catalogFacets = new Facets({
 
 var results = catalogFacets.getResults({
     facets: ["index.title"],
-    operators: ["AND", "OR"]
+    operators: ["AND", "OR"],
+    showCount: true
 });
 console.log(JSON.stringify(results.index, null, "\t"));
