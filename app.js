@@ -30,7 +30,7 @@ var catalogFacets = new Facets({
 });
 
 var results = catalogFacets.getResults({
-    facets: ["index.title"],
+    facets: ["title"],
     operators: ["AND", "OR"],
     showCount: true
 });

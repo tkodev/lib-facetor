@@ -16,7 +16,7 @@ function Constructor(config) {
 	function deepForEach(node, callback, path, level){
 		path = path || "";
 		level = level || 0;
-		if(node.hasOwnProperty("bitmap")){
+		if(node.hasOwnProperty("_bitmap")){
 			return callback(node, path, level)
 		} else {
 			node = _.mapObject(node, function(childNode, key) {
@@ -28,8 +28,8 @@ function Constructor(config) {
 		}
 	}
 
-	// shared - Set an object's deep nested property based on "|" delimited string path
-	function setObjProp(obj, path, val) {
+	// shared - Set an object's deep nested property based on "." delimited string path
+	function setNode(obj, path, val) {
 		path = path.split('.');
 		for (i = 0; i < path.length - 1; i++){
 			if(_.keys(obj).indexOf(path[i]) > -1){
@@ -41,8 +41,8 @@ function Constructor(config) {
 		}
 	}
 
-	// shared - Get an object's deep nested property based on "|" delimited string path
-	function getObjProp(obj, path){
+	// shared - Get an object's deep nested property based on "." delimited string path
+	function getNode(obj, path){
 		for (var i=0, path=path.split('.'), len=path.length; i<len; i++){
 			if(_.keys(obj).indexOf(path[i]) > -1){
 				obj = obj[path[i]];
@@ -53,7 +53,7 @@ function Constructor(config) {
 	
 	// shared - set status based on boolean
 	function setStatus(index, boolean){
-		return deepForEach(index, function(node, path){
+		return deepForEach(index, function(node, path, level){
 			if(node._bitmap){
 				node._status = boolean;
 			}
@@ -63,7 +63,7 @@ function Constructor(config) {
 
 	// shared - set bitmaps to big int based on boolean
 	function setBigInt(index, boolean){
-		return deepForEach(index, function(node, path){
+		return deepForEach(index, function(node, path, level){
 			if(node._bitmap){
 				node._bitmap = boolean ? bigInt(node._bitmap, 2) : bitmap.toString(2);
 			}
@@ -115,21 +115,50 @@ function Constructor(config) {
 	// ****************************************************************************************************
 
 	// results - get bitmap based on supplied index, facets and current path
-	function getBitmap(index, options, node, path, length){
+	function getBitmap(index, items, options, path){
 		var tempFacets = deepClone(options.facets)
 		var tempIndex = deepClone(index);
-		var tempNode = deepClone(node);
-		var allOnes = bigInt(1).shiftLeft(length).minus(1);
+		var allOnes = bigInt(1).shiftLeft(items.length).minus(1);
 		if(path){
 			tempFacets.push(path);
 		}
+		console.log(tempFacets)
 		tempFacets.forEach(function(facet){
-			tempIndex = setObjProp(tempIndex, path, setStatus(tempNode, true));
+			console.log("test", tempIndex, facet, JSON.stringify(getNode(tempIndex, facet)))
+			var tempNode = setStatus(getNode(tempIndex, facet), true);
+			tempIndex = setNode(tempIndex, facet, tempNode);
 		})
+		// console.log(tempIndex);
+		// console.log(JSON.stringify(tempIndex, null, "\t"))
 		// index to bitmap logic here
 		// return bigInt(0);
 		return allOnes
 	}
+
+	// function getBitmap(index, length){
+	// 	// return nested function result
+	// 	return andCategories(index, length);
+	// 	// nested function, traverse categories, use AND logic on each
+	// 	function andCategories(categories, length){
+	// 		var allOnes = bigInt(1).shiftLeft(length).minus(1);
+	// 		return _.values(categories).reduce(function(accumulator, filters){
+	// 			var rslt = orFilters(filters);
+	// 			// If rslt contains matches, return matches, else match all.
+	// 			rslt = rslt.value ? rslt : allOnes;
+	// 			return accumulator.and(rslt);
+	// 		}, allOnes);
+	// 	}
+	// 	// nested function - traverse filter items, use OR logic on each (recursive)
+	// 	function orFilters(filters){
+	// 		return _.values(filters).reduce(function(accumulator, filter){
+	// 			if (filter.hasOwnProperty('status') && (bigInt.isInstance(filter.status[0]) || Array.isArray(filter.status))){
+	// 				return accumulator.or(filter.status[0] || bigInt(0));
+	// 			} else {
+	// 				return accumulator.or(orFilters(filter) || bigInt(0));
+	// 			}
+	// 		}, bigInt(0));
+	// 	}
+	// }
 
 	// results - get count based on suppled bitmap
 	function getCount(bitmap){
@@ -151,7 +180,7 @@ function Constructor(config) {
 
 	function getAttr(index, items, options){
 		return deepForEach(index, function(node, path, level){
-			var bitmap = getBitmap(index, options, node, path, items.length);
+			var bitmap = getBitmap(index, items, options, path);
 			if (options.showBitmap){
 				node._bitmap = bitmap;
 			} else {
@@ -190,7 +219,7 @@ function Constructor(config) {
 	this.getResults = function getResults(options){
 		var results = deepClone(store);
 		// results.index = setBigInt(results.index, true);
-		results.items = getItems(results.items, getBitmap(results.index, options, results.index, "", results.items.length))
+		results.items = getItems(results.items, getBitmap(results.index, results.items, options, ""))
 		results.index = getAttr(results.index, results.items, options)
 		return results;
 	};
