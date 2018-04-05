@@ -12,22 +12,6 @@ function Constructor(config) {
 		return obj ? JSON.parse(JSON.stringify(obj)) : null;
 	}
 
-	// shared - deep map an object, call function on node with bitmap key (recursive)
-	function deepForEach(node, callback, path, level){
-		path = path || "";
-		level = level || 0;
-		if(node.hasOwnProperty("_bitmap")){
-			return callback(node, path, level)
-		} else {
-			node = _.mapObject(node, function(childNode, key) {
-				var childPath = path ? path+"."+key : key;
-				var childLevel = level + 1;
-				return deepForEach(childNode, callback, childPath, childLevel)
-			});
-			return callback(node, path, level)
-		}
-	}
-
 	// shared - Set an object's deep nested property based on "." delimited string path
 	function setNode(obj, path, val) {
 		path = path.split('.');
@@ -50,6 +34,27 @@ function Constructor(config) {
 		};
 		return obj;
 	};
+
+
+	// ****************************************************************************************************
+	// Shared Recursive Functions
+	// ****************************************************************************************************
+
+	// shared - deep map an object, call function on node with bitmap key (recursive)
+	function deepForEach(node, callback, path, level){
+		path = path || "";
+		level = level || 0;
+		if(node.hasOwnProperty("_bitmap")){
+			return callback(node, path, level)
+		} else {
+			node = _.mapObject(node, function(childNode, key) {
+				var childPath = path ? path+"."+key : key;
+				var childLevel = level + 1;
+				return deepForEach(childNode, callback, childPath, childLevel)
+			});
+			return callback(node, path, level)
+		}
+	}
 	
 	// shared - set status based on boolean
 	function setStatus(index, boolean){
@@ -72,7 +77,7 @@ function Constructor(config) {
 	}
 
 	// ****************************************************************************************************
-	// Index functions
+	// Create Functions
 	// ****************************************************************************************************
 
 	// index - build item facets into index
@@ -108,7 +113,6 @@ function Constructor(config) {
 		})
 		return index;
 	}
-
 
 	// ****************************************************************************************************
 	// Results functions
