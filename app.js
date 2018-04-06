@@ -1,8 +1,15 @@
-// init
+// ****************************************************************************************************
+// Init
+// ****************************************************************************************************
+
 var Facets = require('./index.js')
 var catalogFacets = new Facets()
 
-// build index
+
+// ****************************************************************************************************
+// Create index
+// ****************************************************************************************************
+
 catalogFacets.build({
 	facets: ["title", "category"],
 	items: [
@@ -25,11 +32,19 @@ catalogFacets.build({
 		{
 			title: "urban",
 			category: "locks"
+		},
+		{
+			title: ["rural", "urban", "misc"],
+			category: ["stroller","locks"]
 		}
 	]
 });
 
-// optional import / export index json functions.
+
+// ****************************************************************************************************
+// Import / Export Index
+// ****************************************************************************************************
+	
 var index = catalogFacets.export();
 catalogFacets.import(index);
 
@@ -41,4 +56,4 @@ var results = catalogFacets.results({
 });
 
 // log results with tab spacing
-console.log(JSON.stringify(results.index, null, "\t"));
+console.log(JSON.stringify(results, null, "\t"));
