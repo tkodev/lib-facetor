@@ -26,7 +26,7 @@ catalogFacets.build({
 			category: "stroller"
 		},
 		{
-			title: "rural",
+			title: "urban",
 			category: "locks"
 		},
 		{
@@ -34,8 +34,8 @@ catalogFacets.build({
 			category: "locks"
 		},
 		{
-			title: ["rural", "urban", "misc"],
-			category: ["stroller","locks"]
+			title: ["urban", "misc"],
+			category: ["stroller"]
 		}
 	]
 });
@@ -50,7 +50,7 @@ catalogFacets.import(index);
 
 // get results
 var results = catalogFacets.results({
-	facets: ["title"],
+	facets: ["title.rural", "title.misc", "category.locks"],
 	operators: ["AND", "OR"],
 	attributes: ["count"]
 });
