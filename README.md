@@ -78,7 +78,7 @@ catalogFacetor.import(index);
 var results = catalogFacetor.results({
 	facets: ["title.rural", "title.misc"],
 	operators: ["AND", "OR"],
-	attributes: ["count", "status"]
+	attributes: ["count", "status", "path"]
 });
 ```
 
@@ -90,34 +90,41 @@ var results = catalogFacetor.results({
 			"rural": {
 				"_bitmap": "5",
 				"_status": 1,
-				"_count": 3
+				"_count": 3,
+				"_path": "title.rural"
 			},
 			"urban": {
 				"_bitmap": "58",
 				"_status": 0,
-				"_count": 6
+				"_count": 6,
+				"_path": "title.urban"
 			},
 			"misc": {
 				"_bitmap": "32",
 				"_status": 1,
-				"_count": 3
+				"_count": 3,
+				"_path": "title.misc"
 			},
 			"_status": 0.5,
-			"_count": 6
+			"_count": 6,
+			"_path": "title"
 		},
 		"category": {
 			"stroller": {
 				"_bitmap": "39",
 				"_status": 0,
-				"_count": 4
+				"_count": 4,
+				"_path": "category.stroller"
 			},
 			"locks": {
 				"_bitmap": "24",
 				"_status": 0,
-				"_count": 5
+				"_count": 5,
+				"_path": "category.locks"
 			},
 			"_status": 0,
-			"_count": 6
+			"_count": 6,
+			"_path": "category"
 		}
 	},
 	"items": [

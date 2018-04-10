@@ -52,7 +52,7 @@ catalogFacetor.import(index);
 var results = catalogFacetor.results({
 	facets: ["title.rural", "title.misc"],
 	operators: ["AND", "OR"],
-	attributes: ["count", "status"]
+	attributes: ["count", "status", "path"]
 });
 
 // log results with tab spacing

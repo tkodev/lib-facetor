@@ -236,6 +236,9 @@
 					var bitmap = getBitmap(store.index, tempParams, "")
 					node._count = getCount(bitmap);
 				}
+				if (params.attributes.indexOf("path") > -1){
+					node._path = nodePath;
+				}
 				return node;
 			})
 			return rslt;
