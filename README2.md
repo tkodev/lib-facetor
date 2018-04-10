@@ -1,5 +1,5 @@
 # Facetor
-- 🔍 a npm / bower module for catalog style faceted filtering of an array of items. 
+- 🔍 a npm module for catalog style faceted filtering of an array of items. 
 
 ## USAGE
 
