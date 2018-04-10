@@ -50,7 +50,7 @@ catalogFacets.import(index);
 
 // get results
 var results = catalogFacets.results({
-	facets: ["title.rural", "title.misc", "category.locks"],
+	facets: ["title.rural", "title.misc"],
 	operators: ["AND", "OR"],
 	attributes: ["count"]
 });
