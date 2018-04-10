@@ -1,110 +1,144 @@
-# facets.js (WIP)
-- 🔍 a npm / bower module for faceted filtering of an array
+# Facetor
+- 🔍 a npm / bower module for catalog style faceted filtering of an array of items. 
 
 ## USAGE
-### Build index
-- To initiate the module, create an obj containing facetable attributes, and an array of items which has those attributes. 
-```js
-var Facets = require('facets')
 
-// create new facets instance
-var facets = new Facets({
-    index: {
-        "title": {},
-        "category": {}
-    },
-    items: [
-        {
-            title: "rural",
-            category: "stroller"
-        },
-        {
-            title: "urban",
-            category: "stroller"
-        },
-        {
-            title: "rural",
-            category: "stroller"
-        },
-        {
-            title: "rural",
-            category: "locks"
-        },
-        {
-            title: "urban",
-            category: "locks"
-        }
-    ]
+### Init Module
+
+- Node.js
+```bash
+npm install underscore big-integer
+```
+```js
+var Facetor = require('facetor')
+var catalogFacetor = new Facetor();
+// ...
+```
+
+- Browser
+```html
+<head>
+    <script src="javascript.js"></script>
+    <script>
+    var catalogFacetor = new Facetor();
+    // ...
+    </script>
+</head>
+```
+
+- AMD is also supported.
+
+### STEP 1 - Build Index
+
+- build index using an array containing facetable attributes, and an array of items which has those attributes. Attributes in array format are supported (EX: multiple tags or multiple color, etc)
+```js
+// build index
+catalogFacetor.build({
+	facets: ["title", "category"],
+	items: [
+		{
+			title: "rural",
+			category: "stroller"
+		},
+		{
+			title: "urban",
+			category: "stroller"
+		},
+		{
+			title: "rural",
+			category: "stroller"
+		},
+		{
+			title: "urban",
+			category: "locks"
+		},
+		{
+			title: "urban",
+			category: "locks"
+		},
+		{
+			title: ["urban", "misc"],
+			category: ["stroller"]
+		}
+	]
 });
 ```
 
-### Import / Export data
-- The module processes the data after init, to speed up faceting behaviour. 
-- You can export / import this, making it easy to load a prebuilt index for more speed.
+### STEP 2 (optional) - Import / Export data
+- You can export / import `index` into a `.json` format. If you are importing, `STEP 1` is optional.
 ```js
-// get instance's data (you can save this as a JSON)
-var store = facets.getStore(); // gets a copy of the current
-
-// set instance's data - create a new empty facets instance first
-var facets = new Facets();
-var store = facets.setStore(store);
+var index = catalogFacetor.export();
+catalogFacetor.import(index);
 ```
 
-### Get Results
-- Supply `getResults` with:
-- An array containing facet paths (`.` delimited)
-- Logic perators for each level, starting with parent. Supports: `AND` and `OR` (default)
-  - Following Example: `AND` will apply between parent level facets (`title`, `category`), `OR` between `rural` & `urban`, also `stroller` & `locks`
+### STEP 3 - Filter and get results
+
+- Passing in these options
 ```js
-// use this in your front end application
-var results = facets.getResults({
-    facets: ["title.rural"],
-    operators: ["AND", "OR"]
+var results = catalogFacetor.results({
+	facets: ["title.rural", "title.misc"],
+	operators: ["AND", "OR"],
+	attributes: ["count", "status"]
 });
 ```
-- Output:
+
+- Results in
 ```json
 {
-        "title": {
-                "rural": {
-                        "_bitmap": "31",
-                        "_count": 5,
-                        "_path": "title.rural",
-                        "_level": 2
-                },
-                "urban": {
-                        "_bitmap": "31",
-                        "_count": 5,
-                        "_path": "title.urban",
-                        "_level": 2
-                },
-                "_bitmap": "31",
-                "_count": 5,
-                "_path": "title",
-                "_level": 1
-        },
-        "category": {
-                "stroller": {
-                        "_bitmap": "31",
-                        "_count": 5,
-                        "_path": "category.stroller",
-                        "_level": 2
-                },
-                "locks": {
-                        "_bitmap": "31",
-                        "_count": 5,
-                        "_path": "category.locks",
-                        "_level": 2
-                },
-                "_bitmap": "31",
-                "_count": 5,
-                "_path": "category",
-                "_level": 1
-        },
-        "_bitmap": "31",
-        "_count": 5,
-        "_path": "",
-        "_level": 0
+	"index": {
+		"title": {
+			"rural": {
+				"_bitmap": "5",
+				"_status": 1,
+				"_count": 3
+			},
+			"urban": {
+				"_bitmap": "58",
+				"_status": 0,
+				"_count": 6
+			},
+			"misc": {
+				"_bitmap": "32",
+				"_status": 1,
+				"_count": 3
+			},
+			"_status": 0.5,
+			"_count": 6
+		},
+		"category": {
+			"stroller": {
+				"_bitmap": "39",
+				"_status": 0,
+				"_count": 4
+			},
+			"locks": {
+				"_bitmap": "24",
+				"_status": 0,
+				"_count": 5
+			},
+			"_status": 0,
+			"_count": 6
+		}
+	},
+	"items": [
+		{
+			"title": "rural",
+			"category": "stroller"
+		},
+		{
+			"title": "rural",
+			"category": "stroller"
+		},
+		{
+			"title": [
+				"urban",
+				"misc"
+			],
+			"category": [
+				"stroller"
+			]
+		}
+	]
 }
 ```
 

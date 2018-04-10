@@ -1,7 +1,7 @@
 {
-  "name": "facets.js",
+  "name": "facetor",
   "version": "1.0.0",
-  "description": "a npm / bower module for faceted filtering of an array",
+  "description": "a npm / bower module for catalog style faceted filtering of an array of items.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -10,21 +10,23 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/htkoca/facets.js.git"
+    "url": "git+https://github.com/htkoca/facetor.git"
   },
   "keywords": [
-    "faceted",
+    "facet",
     "search",
-    "filtering",
+    "filter",
     "catalog",
-    "results"
+    "results",
+    "items",
+    "listing"
   ],
   "author": "Tony Ko",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/htkoca/facets.js/issues"
+    "url": "https://github.com/htkoca/facetor/issues"
   },
-  "homepage": "https://github.com/htkoca/facets.js#readme",
+  "homepage": "https://github.com/htkoca/facetor#readme",
   "dependencies": {
     "big-integer": "^1.6.26",
     "underscore": "^1.8.3"

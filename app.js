@@ -2,15 +2,15 @@
 // Init
 // ****************************************************************************************************
 
-var Facets = require('./index.js')
-var catalogFacets = new Facets()
+var Facetor = require('./index.js')
+var catalogFacetor = new Facetor()
 
 
 // ****************************************************************************************************
 // Create index
 // ****************************************************************************************************
 
-catalogFacets.build({
+catalogFacetor.build({
 	facets: ["title", "category"],
 	items: [
 		{
@@ -45,11 +45,11 @@ catalogFacets.build({
 // Import / Export Index
 // ****************************************************************************************************
 	
-var index = catalogFacets.export();
-catalogFacets.import(index);
+var index = catalogFacetor.export();
+catalogFacetor.import(index);
 
 // get results
-var results = catalogFacets.results({
+var results = catalogFacetor.results({
 	facets: ["title.rural", "title.misc"],
 	operators: ["AND", "OR"],
 	attributes: ["count", "status"]
