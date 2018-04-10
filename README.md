@@ -1,5 +1,5 @@
 # Facetor
-- 🔍 a npm module for catalog style faceted filtering of an array of items. 
+- 🔍 a NPM module for catalog style faceted filtering. Processes data for sidebar checkbox filters on product catalog / listing pages.
 
 ## USAGE
 
