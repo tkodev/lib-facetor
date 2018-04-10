@@ -196,12 +196,31 @@ function Constructor() {
 
 	// populate index based on store.index with attributes
 	function populateResultsIndex(index, store, params, path) {
-		return _.mapObject(index, function (node, nodeKey) {
+		var rslt = _.mapObject(index, function (node, nodeKey) {
 			// Recursively deep map all of node's children. On each level, populate attributes if params.attributes asks for it.
 			var nodePath = path ? path + "." + nodeKey : nodeKey;
 			var tempParams = deepClone(params);
 			tempParams.facets = params.facets.concat([nodePath])
 			node = node.hasOwnProperty("_bitmap") ? node : populateResultsIndex(node, store, params, nodePath);
+			if (params.attributes.indexOf("status") > -1){
+				// true or false
+				var status = _.findIndex(params.facets, function (facet) {
+					return nodePath.indexOf(facet) == 0;
+				}) > -1 ? 1 : 0;
+				// indeterminate status
+				if(!status && !node.hasOwnProperty("_bitmap")){
+					var length = _.keys(node).filter(function(key){
+						return key.indexOf("_") != 0;
+					}).length
+					status = _.reduceObject(node, function(accumulator, val, key){
+						return accumulator + (val.hasOwnProperty("_status") ? val._status : 0);
+					}, 0);
+					if(status){
+						status = status == length ? 1 : 0.5;
+					}
+				}
+				node._status = status;
+			}
 			if (params.attributes.indexOf("count") > -1){
 				var bitmap = getBitmap(store.index, tempParams, "")
 				node._count = getCount(bitmap);
