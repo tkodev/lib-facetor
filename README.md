@@ -18,7 +18,7 @@ var catalogFacetor = new Facetor();
 - Browser
 ```html
 <head>
-    <script src="javascript.js"></script>
+    <script src="//example.com/url-to-facetor.js"></script>
     <script>
     var catalogFacetor = new Facetor();
     // ...
