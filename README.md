@@ -7,7 +7,7 @@
 
 - Node.js
 ```bash
-npm install underscore big-integer
+npm install facetor
 ```
 ```js
 var Facetor = require('facetor')
