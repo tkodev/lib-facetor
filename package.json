@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "example": "node app.js",
-    "watch": "nodemon app.js"
+    "example": "node node-example.js",
+    "watch": "nodemon node-example.js"
   },
   "repository": {
     "type": "git",
@@ -30,5 +30,8 @@
   "dependencies": {
     "big-integer": "^1.6.26",
     "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.5"
   }
 }

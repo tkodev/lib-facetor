@@ -1,148 +1,129 @@
 # Facetor
-- 🔍 a NPM module for catalog style faceted filtering. Processes data for sidebar checkbox filters on product catalog / listing pages.
+- 🔍 Facetor.js - NPM module to filter a list of objects by its fields. Useful for e-commerce style catalog pages.
 
 ## USAGE
+- Facetor has two steps:
+	- Build Index, by specifying array of Items to filter and the Items' filterable fields.
+	- Build Results, from array of field.values to return, and array of attributes returned for each field.
 
-### Init Module
-
-- Node.js
-```bash
-npm install facetor
-```
-```js
-var Facetor = require('facetor')
-var catalogFacetor = new Facetor();
-// ...
-```
-
-- Browser
-```html
-<head>
-    <script src="//example.com/url-to-facetor.js"></script>
-    <script>
-    var catalogFacetor = new Facetor();
-    // ...
-    </script>
-</head>
-```
-
+### Prep - Load the module
+Let's load the module
+- On Node.js / CommonJS:
+  - in terminal: `npm install facetor`
+  - in node: `var Facetor = require('facetor')`
+- On the browser - html:
+  - in html head tag: 
+	- Underscore.js: `<script src="//example.com/underscore.js"></script>`
+	- BigInteger.js: `<script src="//example.com/biginteger.js"></script>`
+	- Facetor.js: `<script src="//example.com/facetor.js"></script>`
 - AMD is also supported.
 
-### STEP 1 - Build Index
-
-- build index using an array containing facetable attributes, and an array of items which has those attributes. Attributes in array format are supported (EX: multiple tags or multiple color, etc)
+### Step 1 - Build the Index
+Build Index, by specifying array of Items to filter and the Items' filterable fields.
+- EX: Here, we want to make the fields "style" and "category" available for filtering later:
 ```js
-// build index
-catalogFacetor.build({
-	facets: ["title", "category"],
+var catalogFacetor = new Facetor();
+catalogFacetor.buildIndex({
+	facets: ["style", "category"],
 	items: [
-		{
-			title: "rural",
-			category: "stroller"
-		},
-		{
-			title: "urban",
-			category: "stroller"
-		},
-		{
-			title: "rural",
-			category: "stroller"
-		},
-		{
-			title: "urban",
-			category: "locks"
-		},
-		{
-			title: "urban",
-			category: "locks"
-		},
-		{
-			title: ["urban", "misc"],
-			category: ["stroller"]
-		}
+	{
+		title: "Rural Apple",
+		style: "rural",
+		category: "apples"
+	},
+	{
+		title: "Urban Apple",
+		style: "urban",
+		category: "apples"
+	},
+	{
+		title: "Rural Orange",
+		style: "rural",
+		category: "oranges"
+	},
+	{
+		title: "Urban Orange",
+		style: "urban",
+		category: "oranges"
+	},
+	{
+		title: "A mega rural urban apple orange hybrid",
+		style: ["rural", "urban"],
+		category: ["apple", "oranges"]
+	}
 	]
 });
 ```
 
-### STEP 2 (optional) - Import / Export data
-- You can export / import `index` into a `.json` format. If you are importing, `STEP 1` is optional.
+### Step 2 - Filter and get results
+Build Results, from array of field.values, and array of attributes returned for each field.
+- Values in the same parent fields use "OR" binary logic, while fields use "AND" logic.
+- EX: Here, we want to only get "style.rural" and "category.oranges" items.
 ```js
-var index = catalogFacetor.export();
-catalogFacetor.import(index);
-```
-
-### STEP 3 - Filter and get results
-
-- Passing in these options
-```js
-var results = catalogFacetor.results({
-	facets: ["title.rural", "title.misc"],
-	operators: ["AND", "OR"],
-	attributes: ["count", "status", "path"]
+var result = catalogFacetor.buildResult({
+	facets: ["style.rural", "category.oranges"],
+	attributes: ["path", "bitmap", "count", "increment", "status"]
 });
 ```
-
 - Results in
 ```json
 {
-	"index": {
-		"title": {
+	"data": {
+		"style": {
 			"rural": {
-				"_bitmap": "5",
-				"_status": 1,
-				"_count": 3,
-				"_path": "title.rural"
+				"path": "style.rural",
+				"bitmap": "20",
+				"count": 2,
+				"increment": 0,
+				"status": true
 			},
 			"urban": {
-				"_bitmap": "58",
-				"_status": 0,
-				"_count": 6,
-				"_path": "title.urban"
-			},
-			"misc": {
-				"_bitmap": "32",
-				"_status": 1,
-				"_count": 3,
-				"_path": "title.misc"
-			},
-			"_status": 0.5,
-			"_count": 6,
-			"_path": "title"
+				"path": "style.urban",
+				"bitmap": "28",
+				"count": 3,
+				"increment": 1,
+				"status": false
+			}
 		},
 		"category": {
-			"stroller": {
-				"_bitmap": "39",
-				"_status": 0,
-				"_count": 4,
-				"_path": "category.stroller"
+			"apples": {
+				"path": "category.apples",
+				"bitmap": "21",
+				"count": 3,
+				"increment": 1,
+				"status": false
 			},
-			"locks": {
-				"_bitmap": "24",
-				"_status": 0,
-				"_count": 5,
-				"_path": "category.locks"
+			"oranges": {
+				"path": "category.oranges",
+				"bitmap": "20",
+				"count": 2,
+				"increment": 0,
+				"status": true
 			},
-			"_status": 0,
-			"_count": 6,
-			"_path": "category"
+			"apple": {
+				"path": "category.apple",
+				"bitmap": "20",
+				"count": 2,
+				"increment": 0,
+				"status": false
+			}
 		}
 	},
 	"items": [
 		{
-			"title": "rural",
-			"category": "stroller"
+			"title": "Rural Orange",
+			"style": "rural",
+			"category": "oranges"
 		},
 		{
-			"title": "rural",
-			"category": "stroller"
-		},
-		{
-			"title": [
-				"urban",
-				"misc"
+			"title": "A mega rural urban apple orange hybrid",
+			"style": [
+				"rural",
+				"urban"
 			],
 			"category": [
-				"stroller"
+				"apple",
+				"oranges"
 			]
 		}
 	]
