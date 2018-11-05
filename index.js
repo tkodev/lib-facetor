@@ -65,8 +65,8 @@
 					if (item[key]) {
 						var values = Array.isArray(item[key]) ? item[key] : [item[key]];
 						values.forEach(function (value) {
-							if(params.blacklist && params.blacklist.indexOf(value) > -1){
-							} else {
+							var proceed = !(params.blacklist && params.blacklist.indexOf(value) > -1)
+							if(proceed){
 								rslt[key][value] = '';
 							}
 						});
