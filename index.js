@@ -11,7 +11,7 @@
 			module.exports = factory(require('big-integer'));
 	} else {
 			// Browser globals (root is window)
-			root.returnExports = factory(root.bigInt);
+			root.Facetor = factory(root.bigInt);
 	}
 }(this, function (bigInt) {
 	return function() {
