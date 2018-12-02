@@ -15,7 +15,6 @@ Let's load the module
   - in node: `var Facetor = require('facetor')`
 - On the browser - html:
   - in html head tag: 
-	- Underscore.js: `<script src="//example.com/underscore.js"></script>`
 	- BigInteger.js: `<script src="//example.com/biginteger.js"></script>`
 	- Facetor.js: `<script src="//example.com/facetor.js"></script>`
 - AMD is also supported.

@@ -28,8 +28,7 @@
   },
   "homepage": "https://github.com/htkoca/utils-facetor#readme",
   "dependencies": {
-    "big-integer": "^1.6.26",
-    "underscore": "^1.8.3"
+    "big-integer": "^1.6.26"
   },
   "devDependencies": {
     "nodemon": "^1.18.7"
