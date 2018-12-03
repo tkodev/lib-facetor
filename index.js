@@ -214,6 +214,9 @@
 		this.exportIndex = function () {
 			return deepClone(index);
 		};
+		
+		// return
+		return this;
 
 	};
 }));
