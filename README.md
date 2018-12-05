@@ -8,6 +8,7 @@
 	- Build Index, by specifying array of Items to filter and the Items' filterable fields.
 	- Build Results, from array of field.values to return, and array of attributes returned for each field.
 
+
 ### Prep - Load the module
 Let's load the module
 - On Node.js / CommonJS:
@@ -19,7 +20,8 @@ Let's load the module
 	- Facetor.js: `<script src="//example.com/facetor.js"></script>`
 - AMD is also supported.
 
-### Step 1 - Build the Index
+
+### Step 1
 Build Index, by specifying array of Items to filter and the Items' filterable fields.
 - EX: Here, we want to make the fields "style" and "category" available for filtering later:
 ```js
@@ -56,7 +58,8 @@ catalogFacetor.buildIndex({
 });
 ```
 
-### Step 2 - Filter and get results
+
+### Step 2
 Build Results, from array of field.values, and array of attributes returned for each field.
 - Values in the same parent fields use "OR" binary logic, while fields use "AND" logic.
 - EX: Here, we want to only get "style.rural" and "category.oranges" items.
