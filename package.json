@@ -1,6 +1,6 @@
 {
   "name": "facetor",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "a NPM module for catalog style faceted filtering. Processes data for sidebar checkbox filters on product catalog / listing pages.",
   "main": "index.js",
   "scripts": {
