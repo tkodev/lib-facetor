@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/htkoca/utils-facetor.git"
+    "url": "git+https://github.com/htkoca/lib-facetor.git"
   },
   "keywords": [
     "facet",
@@ -24,9 +24,9 @@
   "author": "Tony Ko",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/htkoca/utils-facetor/issues"
+    "url": "https://github.com/htkoca/lib-facetor/issues"
   },
-  "homepage": "https://github.com/htkoca/utils-facetor#readme",
+  "homepage": "https://github.com/htkoca/lib-facetor#readme",
   "dependencies": {
     "big-integer": "^1.6.26"
   },
