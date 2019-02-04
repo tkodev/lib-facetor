@@ -1,5 +1,5 @@
 # Facetor
-- 🔍 Facetor.js - NPM module to filter a list of objects by its fields. Useful for e-commerce style catalog pages.
+- 🔍 Facetor - NPM module to filter a list of objects by its fields. Useful for e-commerce style catalog pages.
 - Version 2.x.x has arrived! with some major breaking changes
 
 
