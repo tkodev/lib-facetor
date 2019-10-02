@@ -1,6 +1,6 @@
 {
   "name": "facetor",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "NPM module to filter a list of objects by its fields. Useful for e-commerce style catalog pages.",
   "main": "index.js",
   "scripts": {
