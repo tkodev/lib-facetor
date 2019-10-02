@@ -134,4 +134,21 @@ var result = catalogFacetor.buildResult({
 }
 ```
 
+### Import and Export
+Allows building of index ahead of time to save cpu and memory.
+- Export current index
+```js
+  var indexJSON = catalogFacetor.exportIndex();
+```
+- Import index from json object
+```js
+  var newCatalogFacetor = new Facetor();
+  newCatalogFacetor.importIndex(indexJSON); // exported from above
+  var results = newCatalogFacetor.buildResult({
+    facets: ["style.rural", "category.oranges"],
+    attributes: ["path", "bitmap", "count", "increment", "status"]
+  });
+  // same results as step 2
+```
+
 
